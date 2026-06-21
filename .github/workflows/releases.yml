@@ -132,14 +132,10 @@ jobs:
           target: "desktop"
           arch: "win64_msvc2019_64"
 
-      - name: Cache vcpkg packages
-        uses: actions/cache@v4
-        with:
-          path: C:\vcpkg\installed
-          key: vcpkg-x64-windows-${{ hashFiles('.github/workflows/releases.yml') }}
-
       - name: Install vcpkg dependencies
         shell: bash
+        env:
+          VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
         run: |
           vcpkg install \
             boost-headers:x64-windows \
