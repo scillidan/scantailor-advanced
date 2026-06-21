@@ -132,14 +132,25 @@ jobs:
           target: "desktop"
           arch: "win64_msvc2019_64"
 
+      - name: Install Boost
+        shell: pwsh
+        run: |
+          $boostVersion = "1.84.0"
+          $boostTag = $boostVersion -replace '\.', '_'
+          $url = "https://boostorg.jfrog.io/artifactory/main/release/$boostVersion/source/boost_$boostTag.7z"
+          Invoke-WebRequest -Uri $url -OutFile boost.7z
+          7z x boost.7z -o"C:\" -y
+          Rename-Item "C:\boost_$boostTag" "C:\boost"
+          cd C:\boost
+          .\bootstrap.bat
+          .\b2 headers
+
       - name: Install vcpkg dependencies
         shell: bash
         env:
           VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
         run: |
           vcpkg install \
-            boost-headers:x64-windows \
-            boost-test:x64-windows \
             libjpeg-turbo:x64-windows \
             libpng:x64-windows \
             tiff:x64-windows \
@@ -152,6 +163,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DPORTABLE_VERSION=ON \
             -DBUILD_TESTS=OFF \
+            -DBOOST_ROOT="C:/boost" \
             -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -A x64
           cmake --build build --config Release
