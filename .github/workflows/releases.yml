@@ -132,15 +132,6 @@ jobs:
           target: "desktop"
           arch: "win64_msvc2019_64"
 
-      - name: Install Boost (headers)
-        shell: bash
-        run: |
-          boost_version="1.84.0"
-          boost_tag="${boost_version//./_}"
-          curl -L -o boost.7z "https://sourceforge.net/projects/boost/files/boost/${boost_version}/boost_${boost_tag}.7z/download"
-          7z x boost.7z -o"C:/" -y
-          mv "C:/boost_${boost_tag}" "C:/boost"
-
       - name: Install vcpkg dependencies
         shell: bash
         env:
@@ -153,6 +144,15 @@ jobs:
             tiff:x64-windows \
             zlib:x64-windows
 
+      - name: Install Boost (complete headers, overwrite vcpkg partial)
+        shell: bash
+        run: |
+          boost_version="1.84.0"
+          boost_tag="${boost_version//./_}"
+          curl -L -o boost.7z "https://sourceforge.net/projects/boost/files/boost/${boost_version}/boost_${boost_tag}.7z/download"
+          7z x boost.7z -o"C:/" -y
+          cp -rf "C:/boost_${boost_tag}/boost" "C:/vcpkg/installed/x64-windows/include/boost"
+
       - name: Configure and build
         shell: bash
         run: |
@@ -160,9 +160,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DPORTABLE_VERSION=ON \
             -DBUILD_TESTS=OFF \
-            -DBOOST_ROOT="C:/boost" \
-            -DBoost_NO_BOOST_CMAKE=ON \
-            -DBoost_LIBRARYDIR="C:/vcpkg/installed/x64-windows/lib" \
             -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -A x64
           cmake --build build --config Release
