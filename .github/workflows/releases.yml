@@ -120,7 +120,8 @@ jobs:
           VER="${{ inputs.version }}"
           VER="${VER#v}"
           sed -i "s/^#define VERSION \"[^\"]*\"/#define VERSION \"${VER}\"/" version.h.in
-          sed -i 's/PRODUCTVERSION @APPLICATION_VERSION_MAJOR@,@APPLICATION_VERSION_MINOR@,@APPLICATION_VERSION_PATCH@/PRODUCTVERSION @APPLICATION_VERSION_MAJOR@,@APPLICATION_VERSION_MINOR@,@APPLICATION_VERSION_PATCH@,0/' src/resources/win32/resources.rc.in
+          sed -i "/if (\"\${VERSION}\" STREQUAL/i\  string(REGEX REPLACE \"-.*\" \"\" VERSION \"\${VERSION}\")" CMakeLists.txt
+          sed -i 's/PRODUCTVERSION @APPLICATION_VERSION_MAJOR@,@APPLICATION_VERSION_MINOR@,@APPLICATION_VERSION_PATCH@$/PRODUCTVERSION @APPLICATION_VERSION_MAJOR@,@APPLICATION_VERSION_MINOR@,@APPLICATION_VERSION_PATCH@,0/' src/resources/win32/resources.rc.in
           sed -i 's/FILETYPE VFT_DLL/FILETYPE VFT_APP/' src/resources/win32/resources.rc.in
 
       - name: Setup MSVC
