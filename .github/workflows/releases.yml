@@ -133,17 +133,16 @@ jobs:
           arch: "win64_msvc2019_64"
 
       - name: Install Boost
-        shell: pwsh
+        shell: bash
         run: |
-          $boostVersion = "1.84.0"
-          $boostTag = $boostVersion -replace '\.', '_'
-          $url = "https://sourceforge.net/projects/boost/files/boost/$boostVersion/boost_$boostTag.7z/download"
-          Invoke-WebRequest -Uri $url -OutFile boost.7z -MaximumRetryCount 3
-          7z x boost.7z -o"C:\" -y
-          Rename-Item "C:\boost_$boostTag" "C:\boost"
-          cd C:\boost
-          .\bootstrap.bat
-          .\b2 headers
+          boost_version="1.84.0"
+          boost_tag="${boost_version//./_}"
+          curl -L -o boost.7z "https://sourceforge.net/projects/boost/files/boost/${boost_version}/boost_${boost_tag}.7z/download"
+          7z x boost.7z -o"C:/" -y
+          mv "C:/boost_${boost_tag}" "C:/boost"
+          cd C:/boost
+          cmd //c bootstrap.bat
+          cmd //c "b2 headers"
 
       - name: Install vcpkg dependencies
         shell: bash
