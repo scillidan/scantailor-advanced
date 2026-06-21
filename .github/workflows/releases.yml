@@ -132,34 +132,36 @@ jobs:
           target: "desktop"
           arch: "win64_msvc2019_64"
 
-      - name: Install vcpkg dependencies
+      - name: Install vcpkg dependencies (image libs only)
         shell: bash
         env:
           VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
         run: |
           vcpkg install \
-            boost-test:x64-windows \
             libjpeg-turbo:x64-windows \
             libpng:x64-windows \
             tiff:x64-windows \
             zlib:x64-windows
 
-      - name: Install Boost (complete headers, overwrite vcpkg partial)
+      - name: Install Boost (complete headers)
         shell: bash
         run: |
           boost_version="1.84.0"
           boost_tag="${boost_version//./_}"
           curl -L -o boost.7z "https://sourceforge.net/projects/boost/files/boost/${boost_version}/boost_${boost_tag}.7z/download"
           7z x boost.7z -o"C:/" -y
-          cp -rf "C:/boost_${boost_tag}/boost" "C:/vcpkg/installed/x64-windows/include/boost"
 
       - name: Configure and build
         shell: bash
         run: |
+          boost_tag="1_84_0"
+          sed -i 's/find_package(Boost 1.60 COMPONENTS unit_test_framework REQUIRED)/find_package(Boost 1.60 REQUIRED)/' CMakeLists.txt
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DPORTABLE_VERSION=ON \
             -DBUILD_TESTS=OFF \
+            -DBOOST_ROOT="C:/boost_${boost_tag}" \
+            -DBoost_NO_SYSTEM_PATHS=ON \
             -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -A x64
           cmake --build build --config Release
