@@ -142,6 +142,7 @@ jobs:
         shell: bash
         run: |
           vcpkg install \
+            boost-headers:x64-windows \
             boost-test:x64-windows \
             libjpeg-turbo:x64-windows \
             libpng:x64-windows \
