@@ -140,9 +140,6 @@ jobs:
           curl -L -o boost.7z "https://sourceforge.net/projects/boost/files/boost/${boost_version}/boost_${boost_tag}.7z/download"
           7z x boost.7z -o"C:/" -y
           mv "C:/boost_${boost_tag}" "C:/boost"
-          cd C:/boost
-          cmd //c bootstrap.bat
-          cmd //c "b2 headers"
 
       - name: Install vcpkg dependencies
         shell: bash
